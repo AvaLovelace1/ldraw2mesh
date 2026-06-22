@@ -1,0 +1,33 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "ldraw2mesh"
+version = "0.1.0"
+description = "Convert LDraw files to glTF (.glb/.gltf)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Ava Pun" }]
+dependencies = ["numpy>=1.24", "pygltflib>=1.16"]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "ty"]
+
+[project.scripts]
+ldraw2mesh = "ldraw2mesh.cli:main"
+
+[tool.maturin]
+python-source = "python"
+module-name = "ldraw2mesh._native"
+
+[tool.ruff]
+src = ["python", "tests"]
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["native: requires the compiled ldraw2mesh._native module"]
