@@ -1,0 +1,5 @@
+0 Test Triangle Pair
+0 Name: tri.dat
+0 !LDRAW_ORG Part
+3 16 0 0 0 1 0 0 1 1 0
+3 16 0 0 0 1 1 0 0 1 0

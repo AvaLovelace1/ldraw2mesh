@@ -1,0 +1,4 @@
+0 // Minimal LDConfig for ldraw2mesh tests
+0 !COLOUR Black                                                 CODE   0   VALUE #1B2A34   EDGE #808080
+0 !COLOUR Red                                                   CODE   4   VALUE #C91A09   EDGE #333333
+0 !COLOUR Trans_Green                                           CODE  34   VALUE #237841   EDGE #333333   ALPHA 128
