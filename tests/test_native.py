@@ -96,6 +96,19 @@ def test_edge_aware_output_dtypes_and_triangle_shape():
     assert np.allclose(out_norm[0], [0, 0, 1])  # +Z for CCW triangle in XY plane
 
 
+def test_edge_aware_degenerate_triangle_yields_zero_normal():
+    from ldraw2mesh import _native
+
+    # The normalize() zero-magnitude guard must emit a finite zero vector.
+    pos = np.array([[0, 0, 0], [0, 0, 0], [1, 0, 0]], dtype=np.float32)
+    tris = np.array([[0, 1, 2]], dtype=np.uint32)
+    hard = np.empty((0, 2), dtype=np.uint32)
+    out_pos, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
+    assert out_tris.shape == (1, 3)
+    assert np.all(np.isfinite(out_norm))
+    assert np.allclose(out_norm, 0.0)
+
+
 def test_geometry_settings_defaults_match_upstream():
     from ldraw2mesh import _native
 
