@@ -13,7 +13,7 @@ authors = [{ name = "Ava Pun" }]
 dependencies = ["numpy>=1.24", "pygltflib>=1.16"]
 
 [dependency-groups]
-dev = ["pytest", "ruff", "ty"]
+dev = ["maturin", "pytest", "ruff", "ty"]
 
 [project.scripts]
 ldraw2mesh = "ldraw2mesh.cli:main"
