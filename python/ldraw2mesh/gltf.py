@@ -9,8 +9,8 @@ from typing import Any
 import numpy as np
 import pygltflib
 
+from . import _native
 from .materials import fallback_material, material_for_color
-from .normals import edge_aware_normals
 from .scene import MeshJob
 from .transform import LDRAW_TO_GLTF, to_gltf_matrix
 
@@ -61,7 +61,7 @@ def write_gltf(
     instance_node_indices: list[int] = []
 
     for job in jobs:
-        positions, normals, triangles = edge_aware_normals(
+        positions, normals, triangles = _native.edge_aware_normals(
             job.positions, job.triangles, job.hard_edges
         )
 
