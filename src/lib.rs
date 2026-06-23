@@ -1,7 +1,10 @@
 // Vendored from ldr_tools_blender (ldr_tools_py/src/lib.rs) at rev ee0a1a6.
 // Copyright (c) 2023 SMG. MIT License. See THIRD_PARTY.md.
-// Only change vs upstream: the #[pymodule] module is renamed `ldr_tools_py` -> `_native`.
+// Changes vs upstream: the #[pymodule] module is renamed `ldr_tools_py` -> `_native`,
+// and a local `edge_aware_normals` pyfunction is added (see src/normals.rs).
 use pyo3::prelude::*;
+
+mod normals;
 
 macro_rules! python_enum {
     ($py_ty:ident, $rust_ty:ty, $( $i:ident ),+) => {
@@ -51,7 +54,7 @@ mod _native {
     use std::collections::HashMap;
 
     use map_py::{MapPy, TypedList};
-    use numpy::{PyArray1, PyArray2, PyArray3};
+    use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray2};
 
     #[pymodule_init]
     fn init(_m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -273,5 +276,25 @@ mod _native {
             .into_iter()
             .map(|(k, v)| Ok((k, v.map_py(py)?)))
             .collect()
+    }
+
+    /// Local addition (not from upstream): edge-aware vertex normals in Rust.
+    #[pyfunction]
+    fn edge_aware_normals<'py>(
+        py: Python<'py>,
+        positions: PyReadonlyArray2<'py, f32>,
+        triangles: PyReadonlyArray2<'py, u32>,
+        hard_edges: PyReadonlyArray2<'py, u32>,
+    ) -> (
+        Bound<'py, PyArray2<f32>>,
+        Bound<'py, PyArray2<f32>>,
+        Bound<'py, PyArray2<u32>>,
+    ) {
+        let (p, n, t) = crate::normals::edge_aware_normals(
+            positions.as_array(),
+            triangles.as_array(),
+            hard_edges.as_array(),
+        );
+        (p.into_pyarray(py), n.into_pyarray(py), t.into_pyarray(py))
     }
 }

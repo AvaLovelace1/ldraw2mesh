@@ -6,6 +6,7 @@ UByteArray: TypeAlias = "np.ndarray[tuple[int], np.dtype[np.uint8]]"
 UIntArray: TypeAlias = "np.ndarray[tuple[int], np.dtype[np.uint32]]"
 FloatArray: TypeAlias = "np.ndarray[tuple[int], np.dtype[np.float32]]"
 UVec2Array: TypeAlias = "np.ndarray[tuple[int, Literal[2]], np.dtype[np.uint32]]"
+UVec3Array: TypeAlias = "np.ndarray[tuple[int, Literal[3]], np.dtype[np.uint32]]"
 Vec2Array: TypeAlias = "np.ndarray[tuple[int, Literal[2]], np.dtype[np.float32]]"
 Vec3Array: TypeAlias = "np.ndarray[tuple[int, Literal[3]], np.dtype[np.float32]]"
 Mat4: TypeAlias = "np.ndarray[tuple[Literal[4], Literal[4]], np.dtype[np.float32]]"
@@ -82,3 +83,8 @@ def load_file_instanced(
     path: str, ldraw_path: str, additional_paths: list[str], settings: GeometrySettings
 ) -> LDrawSceneInstanced: ...
 def load_color_table(ldraw_path: str) -> dict[int, LDrawColor]: ...
+def edge_aware_normals(
+    positions: Vec3Array,
+    triangles: UVec3Array,
+    hard_edges: UVec2Array,
+) -> tuple[Vec3Array, Vec3Array, UVec3Array]: ...
