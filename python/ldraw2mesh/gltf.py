@@ -64,6 +64,8 @@ def write_gltf(
         positions, normals, triangles = _native.edge_aware_normals(
             job.positions, job.triangles, job.hard_edges
         )
+        if positions.shape[0] == 0:
+            continue  # geometry with no triangles: nothing to emit
 
         pos_view = buf.add(
             positions.astype(np.float32).tobytes(), pygltflib.ARRAY_BUFFER

@@ -71,3 +71,24 @@ def test_unknown_color_uses_fallback(tmp_path):
     write_gltf([job], {}, out)  # empty color table
     g = pygltflib.GLTF2().load(str(out))
     assert len(g.materials) == 1  # fallback created
+
+
+def _empty_job():
+    return MeshJob(
+        path_name="empty.dat",
+        color=4,
+        positions=np.empty((0, 3), dtype=np.float32),
+        triangles=np.empty((0, 3), dtype=np.uint32),
+        face_colors=np.empty((0,), dtype=np.uint32),
+        hard_edges=np.empty((0, 2), dtype=np.uint32),
+        transforms=np.stack([np.eye(4, dtype=np.float32)]),
+    )
+
+
+def test_zero_triangle_job_is_skipped(tmp_path):
+    # A job with no triangles must not crash write_gltf and must contribute no mesh or nodes.
+    out = tmp_path / "mixed.glb"
+    write_gltf([_empty_job(), _one_quad_job(1)], _color_table(), out)
+    g = pygltflib.GLTF2().load(str(out))
+    assert len(g.meshes) == 1  # only the non-empty job
+    assert len(g.nodes) == 2  # 1 instance node from the quad job + 1 root
