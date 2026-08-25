@@ -18,7 +18,7 @@ def test_edge_aware_smooth_bend_without_hard_edge_averages():
     pos = np.array([[0, 0, 0], [1, 0, 0], [0.5, 1, 0], [0.5, -1, 1]], dtype=np.float32)
     tris = np.array([[0, 1, 2], [1, 0, 3]], dtype=np.uint32)
     hard = np.empty((0, 2), dtype=np.uint32)
-    out_pos, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
+    out_pos, out_norm, _ = _native.edge_aware_normals(pos, tris, hard)
     assert out_pos.shape[0] == 4  # nothing split
     assert np.allclose(np.linalg.norm(out_norm, axis=1), 1.0)
 
@@ -29,7 +29,7 @@ def test_edge_aware_hard_edge_splits_seam():
     pos = np.array([[0, 0, 0], [1, 0, 0], [0.5, 1, 0], [0.5, -1, 1]], dtype=np.float32)
     tris = np.array([[0, 1, 2], [1, 0, 3]], dtype=np.uint32)
     hard = np.array([[0, 1]], dtype=np.uint32)
-    out_pos, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
+    out_pos, _, out_tris = _native.edge_aware_normals(pos, tris, hard)
     assert out_pos.shape[0] == 6
     assert out_tris.shape == (2, 3)
     assert set(out_tris[0].tolist()).isdisjoint(out_tris[1].tolist())
@@ -41,7 +41,7 @@ def test_edge_aware_area_weighted_blend():
     pos = np.array([[0, 0, 0], [4, 0, 0], [0, 4, 0], [0, 0, 1]], dtype=np.float32)
     tris = np.array([[0, 1, 2], [0, 1, 3]], dtype=np.uint32)
     hard = np.empty((0, 2), dtype=np.uint32)
-    out_pos, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
+    _, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
 
     v0_idx = int(out_tris[0, 0])  # output index for original vertex 0
     blended = out_norm[v0_idx]
@@ -89,7 +89,7 @@ def test_edge_aware_cube_hard_edges_per_face_normals():
     tris = np.array(tris, dtype=np.uint32)
     hard = np.array([sorted(p) for p in hard_pairs], dtype=np.uint32)
 
-    out_pos, out_norm, out_tris = _native.edge_aware_normals(v, tris, hard)
+    out_pos, out_norm, _ = _native.edge_aware_normals(v, tris, hard)
     assert out_pos.shape[0] == 24  # each corner splits into 3 faces
     absn = np.abs(out_norm)
     assert np.allclose(np.sort(absn, axis=1)[:, 2], 1.0)
@@ -117,7 +117,7 @@ def test_edge_aware_degenerate_triangle_yields_zero_normal():
     pos = np.array([[0, 0, 0], [0, 0, 0], [1, 0, 0]], dtype=np.float32)
     tris = np.array([[0, 1, 2]], dtype=np.uint32)
     hard = np.empty((0, 2), dtype=np.uint32)
-    out_pos, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
+    _, out_norm, out_tris = _native.edge_aware_normals(pos, tris, hard)
     assert out_tris.shape == (1, 3)
     assert np.all(np.isfinite(out_norm))
     assert np.allclose(out_norm, 0.0)

@@ -4,7 +4,7 @@ from typing import Protocol
 
 import pygltflib
 
-__all__ = ["material_for_color", "fallback_material", "FALLBACK_RGBA"]
+__all__ = ["FALLBACK_RGBA", "fallback_material", "material_for_color"]
 
 FALLBACK_RGBA: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
 

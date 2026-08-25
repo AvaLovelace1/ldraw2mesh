@@ -8,7 +8,7 @@ from .gltf import write_gltf
 from .library import resolve_library
 from .scene import build_jobs
 
-__all__ = ["convert", "load_scene", "DEFAULT_SCALE"]
+__all__ = ["DEFAULT_SCALE", "convert", "load_scene"]
 
 DEFAULT_SCALE = 0.0004  # 1 LDU = 0.4 mm -> meters
 

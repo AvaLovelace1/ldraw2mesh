@@ -2,17 +2,17 @@ from typing import Final, Literal, TypeAlias
 
 import numpy as np
 
-UByteArray: TypeAlias = "np.ndarray[tuple[int], np.dtype[np.uint8]]"
-UIntArray: TypeAlias = "np.ndarray[tuple[int], np.dtype[np.uint32]]"
-FloatArray: TypeAlias = "np.ndarray[tuple[int], np.dtype[np.float32]]"
-UVec2Array: TypeAlias = "np.ndarray[tuple[int, Literal[2]], np.dtype[np.uint32]]"
-UVec3Array: TypeAlias = "np.ndarray[tuple[int, Literal[3]], np.dtype[np.uint32]]"
-Vec2Array: TypeAlias = "np.ndarray[tuple[int, Literal[2]], np.dtype[np.float32]]"
-Vec3Array: TypeAlias = "np.ndarray[tuple[int, Literal[3]], np.dtype[np.float32]]"
-Mat4: TypeAlias = "np.ndarray[tuple[Literal[4], Literal[4]], np.dtype[np.float32]]"
-Mat4Array: TypeAlias = (
-    "np.ndarray[tuple[int, Literal[4], Literal[4]], np.dtype[np.float32]]"
-)
+UByteArray: TypeAlias = np.ndarray[tuple[int], np.dtype[np.uint8]]
+UIntArray: TypeAlias = np.ndarray[tuple[int], np.dtype[np.uint32]]
+FloatArray: TypeAlias = np.ndarray[tuple[int], np.dtype[np.float32]]
+UVec2Array: TypeAlias = np.ndarray[tuple[int, Literal[2]], np.dtype[np.uint32]]
+UVec3Array: TypeAlias = np.ndarray[tuple[int, Literal[3]], np.dtype[np.uint32]]
+Vec2Array: TypeAlias = np.ndarray[tuple[int, Literal[2]], np.dtype[np.float32]]
+Vec3Array: TypeAlias = np.ndarray[tuple[int, Literal[3]], np.dtype[np.float32]]
+Mat4: TypeAlias = np.ndarray[tuple[Literal[4], Literal[4]], np.dtype[np.float32]]
+Mat4Array: TypeAlias = np.ndarray[
+    tuple[int, Literal[4], Literal[4]], np.dtype[np.float32]
+]
 
 class StudType:
     Disabled: Final[StudType]
