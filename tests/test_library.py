@@ -9,10 +9,9 @@ def _make_library(root):
     return root
 
 
-def test_explicit_path_wins(tmp_path, monkeypatch):
+def test_explicit_path_works(tmp_path, monkeypatch):
     (tmp_path / "lib").mkdir(exist_ok=True)
     lib = _make_library(tmp_path / "lib")
-    monkeypatch.delenv("LDRAW_LIBRARY_PATH", raising=False)
     assert resolve_library(lib) == lib.resolve()
 
 
@@ -24,16 +23,40 @@ def test_env_var_used_when_no_explicit(tmp_path, monkeypatch):
     assert resolve_library() == lib.resolve()
 
 
-def test_missing_library_raises_actionable_error(tmp_path, monkeypatch):
+def test_falls_back_to_candidate_locations_when_env_var_absent(tmp_path, monkeypatch):
     monkeypatch.delenv("LDRAW_LIBRARY_PATH", raising=False)
+    lib = tmp_path / "found"
+    lib.mkdir()
+    _make_library(lib)
+    monkeypatch.setattr(
+        "ldraw2mesh.library._candidates", lambda: [tmp_path / "absent", lib]
+    )
+    assert resolve_library() == lib.resolve()
+
+
+def test_invalid_explicit_path_raises(tmp_path, monkeypatch):
     missing = tmp_path / "nope"
     with pytest.raises(LDrawLibraryNotFound) as exc:
         resolve_library(missing)
     assert "ldraw.org" in str(exc.value).lower()
 
 
-def test_directory_without_ldconfig_or_parts_is_invalid(tmp_path, monkeypatch):
+def test_invalid_env_var_raises(tmp_path, monkeypatch):
+    monkeypatch.setenv("LDRAW_LIBRARY_PATH", str(tmp_path / "nope"))
+    with pytest.raises(LDrawLibraryNotFound) as exc:
+        resolve_library()
+    assert "LDRAW_LIBRARY_PATH" in str(exc.value)
+
+
+def test_no_library_anywhere_raises(tmp_path, monkeypatch):
     monkeypatch.delenv("LDRAW_LIBRARY_PATH", raising=False)
+    monkeypatch.setattr("ldraw2mesh.library._candidates", lambda: [tmp_path / "absent"])
+    with pytest.raises(LDrawLibraryNotFound) as exc:
+        resolve_library()
+    assert "ldraw.org" in str(exc.value).lower()
+
+
+def test_directory_without_ldconfig_or_parts_is_invalid(tmp_path, monkeypatch):
     empty = tmp_path / "empty"
     empty.mkdir()
     with pytest.raises(LDrawLibraryNotFound):
