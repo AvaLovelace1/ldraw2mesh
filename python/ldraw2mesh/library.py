@@ -7,7 +7,7 @@ from pathlib import Path
 __all__ = ["LDrawLibraryNotFound", "resolve_library"]
 
 _DOWNLOAD_HINT = (
-    "Download the official library from https://www.ldraw.org/ , then pass its path "
+    "Download the official library from https://www.ldraw.org/, then pass its path "
     "via --ldraw-library or set $LDRAW_LIBRARY_PATH."
 )
 
