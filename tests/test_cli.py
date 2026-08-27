@@ -65,3 +65,20 @@ def test_calls_convert_with_parsed_args(tmp_path, monkeypatch):
     assert calls["studs"] == "logo"
     assert calls["gaps"] is True
     assert calls["ldraw_library"] == "/lib"
+
+
+def test_missing_input_file_returns_exit_code_2(tmp_path, capsys):
+    library = tmp_path / "lib"
+    (library / "parts").mkdir(parents=True)
+    (library / "LDConfig.ldr").write_text("0 // minimal\n")
+    rc = cli.main(
+        [
+            str(tmp_path / "absent.ldr"),
+            "-o",
+            str(tmp_path / "out.glb"),
+            "--ldraw-library",
+            str(library),
+        ]
+    )
+    assert rc == 2
+    assert "absent.ldr" in capsys.readouterr().err

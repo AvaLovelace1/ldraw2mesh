@@ -7,6 +7,13 @@ try:
 except PackageNotFoundError:  # editable/source checkout without metadata
     __version__ = "0.0.0.dev0"
 
-from .convert import convert, load_scene
+from .convert import EmptySceneError, convert, load_scene
+from .library import LDrawLibraryNotFound
 
-__all__ = ["__version__", "convert", "load_scene"]
+__all__ = [
+    "EmptySceneError",
+    "LDrawLibraryNotFound",
+    "__version__",
+    "convert",
+    "load_scene",
+]

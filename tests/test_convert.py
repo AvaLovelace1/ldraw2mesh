@@ -36,3 +36,33 @@ def test_load_scene_returns_instanced_scene():
     assert hasattr(scene, "geometry_world_transforms")
     assert hasattr(scene, "geometry_cache")
     assert len(scene.geometry_cache) >= 1
+
+
+def test_missing_input_file_raises(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        ldraw2mesh.convert(
+            tmp_path / "nope.ldr", tmp_path / "o.glb", ldraw_library=LIBRARY
+        )
+
+
+def test_directory_input_raises(tmp_path):
+    with pytest.raises(IsADirectoryError):
+        ldraw2mesh.convert(tmp_path, tmp_path / "o.glb", ldraw_library=LIBRARY)
+
+
+def test_file_with_no_geometry_raises_instead_of_writing_empty_gltf(tmp_path):
+    empty = tmp_path / "empty.ldr"
+    empty.write_text("0 Just a comment, no parts\n")
+    out = tmp_path / "o.glb"
+    with pytest.raises(ldraw2mesh.EmptySceneError):
+        ldraw2mesh.convert(empty, out, ldraw_library=LIBRARY)
+    assert not out.exists()
+
+
+def test_unresolvable_part_raises_instead_of_writing_empty_gltf(tmp_path):
+    model = tmp_path / "missing_part.ldr"
+    model.write_text("1 4 0 0 0 1 0 0 0 1 0 0 0 1 not-in-this-library.dat\n")
+    out = tmp_path / "o.glb"
+    with pytest.raises(ldraw2mesh.EmptySceneError):
+        ldraw2mesh.convert(model, out, ldraw_library=LIBRARY)
+    assert not out.exists()
