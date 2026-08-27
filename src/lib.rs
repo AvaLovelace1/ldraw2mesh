@@ -44,7 +44,17 @@ macro_rules! python_enum {
     };
 }
 
+/// Return type of the local `edge_aware_normals` pyfunction: (positions, normals, triangles).
+type NormalsResult<'py> = (
+    Bound<'py, numpy::PyArray2<f32>>,
+    Bound<'py, numpy::PyArray2<f32>>,
+    Bound<'py, numpy::PyArray2<u32>>,
+);
+
+// Kept on one line as vendored; rustfmt would otherwise explode the macro arguments.
+#[rustfmt::skip]
 python_enum!(StudType, ldr_tools::StudType, Disabled, Normal, Logo4, HighContrast);
+#[rustfmt::skip]
 python_enum!(PrimitiveResolution, ldr_tools::PrimitiveResolution, Low, Normal, High);
 
 #[pymodule]
@@ -285,11 +295,7 @@ mod _native {
         positions: PyReadonlyArray2<'py, f32>,
         triangles: PyReadonlyArray2<'py, u32>,
         hard_edges: PyReadonlyArray2<'py, u32>,
-    ) -> (
-        Bound<'py, PyArray2<f32>>,
-        Bound<'py, PyArray2<f32>>,
-        Bound<'py, PyArray2<u32>>,
-    ) {
+    ) -> NormalsResult<'py> {
         let (p, n, t) = crate::normals::edge_aware_normals(
             positions.as_array(),
             triangles.as_array(),
