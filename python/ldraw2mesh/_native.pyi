@@ -55,8 +55,8 @@ class LDrawGeometry:
 class LDrawColor:
     name: str
     finish_name: str
-    rgba_linear: tuple[float, float, float, float]
-    speckle_rgba_linear: tuple[float, float, float, float] | None
+    rgba_linear: list[float]
+    speckle_rgba_linear: list[float] | None
 
 class GeometrySettings:
     triangulate: bool
@@ -76,12 +76,26 @@ class LDrawSceneInstanced:
     geometry_world_transforms: dict[tuple[LDrawPath, int], Mat4Array]
     geometry_cache: dict[LDrawPath, LDrawGeometry]
 
+class PointInstances:
+    translations: Vec3Array
+    rotations_axis: Vec3Array
+    rotations_angle: FloatArray
+    scales: Vec3Array
+
+class LDrawSceneInstancedPoints:
+    main_model_name: str
+    geometry_point_instances: dict[tuple[LDrawPath, int], PointInstances]
+    geometry_cache: dict[LDrawPath, LDrawGeometry]
+
 def load_file(
     path: str, ldraw_path: str, additional_paths: list[str], settings: GeometrySettings
 ) -> LDrawScene: ...
 def load_file_instanced(
     path: str, ldraw_path: str, additional_paths: list[str], settings: GeometrySettings
 ) -> LDrawSceneInstanced: ...
+def load_file_instanced_points(
+    path: str, ldraw_path: str, additional_paths: list[str], settings: GeometrySettings
+) -> LDrawSceneInstancedPoints: ...
 def load_color_table(ldraw_path: str) -> dict[int, LDrawColor]: ...
 def edge_aware_normals(
     positions: Vec3Array,

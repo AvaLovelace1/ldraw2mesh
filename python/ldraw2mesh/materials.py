@@ -1,5 +1,6 @@
 """Map LDraw colors to glTF PBR metallic-roughness materials."""
 
+from collections.abc import Sequence
 from typing import Protocol
 
 import pygltflib
@@ -10,12 +11,19 @@ FALLBACK_RGBA: tuple[float, float, float, float] = (0.5, 0.5, 0.5, 1.0)
 
 
 class _Color(Protocol):
-    name: str
-    finish_name: str
-    rgba_linear: tuple[float, float, float, float]
+    """Read-only view of the fields ``_native.LDrawColor`` exposes."""
+
+    @property
+    def name(self) -> str: ...
+    @property
+    def finish_name(self) -> str: ...
+    @property
+    def rgba_linear(self) -> Sequence[float]: ...
 
 
-def _pbr(rgba, metallic: float, roughness: float) -> pygltflib.PbrMetallicRoughness:
+def _pbr(
+    rgba: Sequence[float], metallic: float, roughness: float
+) -> pygltflib.PbrMetallicRoughness:
     r, g, b, a = (float(x) for x in rgba)
     return pygltflib.PbrMetallicRoughness(
         baseColorFactor=[r, g, b, a],
