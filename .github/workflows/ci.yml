@@ -13,6 +13,8 @@ jobs:
         with:
           python-version: "3.14"
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
       - uses: astral-sh/setup-uv@v7
       - name: Install dependencies
         run: uv sync
@@ -22,6 +24,10 @@ jobs:
         run: uv run ruff format --check .
       - name: Type check
         run: uv run ty check
+      - name: Rust format check
+        run: cargo fmt --check
+      - name: Rust lint
+        run: cargo clippy --all-targets -- -D warnings
       - name: Build native module
         run: uv run maturin develop --uv
       - name: Test

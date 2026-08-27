@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from .convert import DEFAULT_SCALE, convert
+from .convert import DEFAULT_SCALE, EmptySceneError, convert
 from .library import LDrawLibraryNotFound
 
 __all__ = ["main"]
@@ -50,8 +50,12 @@ def main(argv: list[str] | None = None) -> int:
             studs=args.studs,
             gaps=args.gaps,
         )
-    except LDrawLibraryNotFound as exc:
+    except (LDrawLibraryNotFound, EmptySceneError) as exc:
         print(str(exc), file=sys.stderr)
+        return 2
+    except OSError as exc:
+        detail = exc.strerror or str(exc)
+        print(f"{detail}: {exc.filename}" if exc.filename else detail, file=sys.stderr)
         return 2
     return 0
 

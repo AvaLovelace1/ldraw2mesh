@@ -39,6 +39,11 @@ def build_jobs(scene) -> list[MeshJob]:
         # ldr_tools compresses uniform-color geometry to a single entry; expand back.
         if face_colors.size == 1 and n_faces > 1:
             face_colors = np.full(n_faces, face_colors[0], dtype=np.uint32)
+        if face_colors.size != n_faces:
+            raise ValueError(
+                f"geometry {path.normalized_name!r} has {face_colors.size} face "
+                f"colors for {n_faces} triangles"
+            )
         resolved = np.where(face_colors == CURRENT_COLOR, np.uint32(color), face_colors)
 
         jobs.append(

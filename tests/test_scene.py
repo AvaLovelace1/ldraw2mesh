@@ -88,3 +88,15 @@ def test_build_jobs_broadcasts_current_color_uniform():
     )
     jobs = build_jobs(scene)
     assert jobs[0].face_colors.tolist() == [9, 9]
+
+
+def test_build_jobs_rejects_face_color_count_mismatch():
+    import pytest
+
+    path = FakePath("bad.dat")
+    geom = _quad_geometry([4, 4, 4])  # 3 colors for 2 triangles
+    scene = FakeScene(
+        {(path, 4): np.stack([np.eye(4, dtype=np.float32)])}, {path: geom}
+    )
+    with pytest.raises(ValueError, match="face colors"):
+        build_jobs(scene)

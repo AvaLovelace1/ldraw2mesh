@@ -17,9 +17,16 @@ jobs:
           - { os: macos-14, target: aarch64 }
     steps:
       - uses: actions/checkout@v7
+      # One wheel is built per interpreter (the extension is not abi3), so every
+      # targeted version must actually be present on the runner.
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.14"
+          python-version: |
+            3.10
+            3.11
+            3.12
+            3.13
+            3.14
       - uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}

@@ -39,7 +39,9 @@ struct UnionFind {
 
 impl UnionFind {
     fn new(n: usize) -> Self {
-        Self { parent: (0..n).collect() }
+        Self {
+            parent: (0..n).collect(),
+        }
     }
 
     fn find(&mut self, mut x: usize) -> usize {
@@ -92,8 +94,8 @@ pub fn edge_aware_normals(
     // Incident triangles per vertex, recording first-appearance order for determinism.
     let mut incident: HashMap<u32, Vec<usize>> = HashMap::new();
     let mut vertex_order: Vec<u32> = Vec::new();
-    for t in 0..n_tris {
-        for &v in &tri_verts[t] {
+    for (t, verts) in tri_verts.iter().enumerate() {
+        for &v in verts {
             incident
                 .entry(v)
                 .or_insert_with(|| {
@@ -112,8 +114,7 @@ pub fn edge_aware_normals(
         let tris = &incident[&v];
         let mut uf = UnionFind::new(tris.len());
         // Map triangle id -> local index into `tris`.
-        let local: HashMap<usize, usize> =
-            tris.iter().enumerate().map(|(i, &t)| (t, i)).collect();
+        let local: HashMap<usize, usize> = tris.iter().enumerate().map(|(i, &t)| (t, i)).collect();
 
         // Triangles sharing each edge (v, w).
         let mut edge_tris: HashMap<u32, Vec<usize>> = HashMap::new();

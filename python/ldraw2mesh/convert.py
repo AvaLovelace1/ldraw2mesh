@@ -1,5 +1,6 @@
 """High-level LDraw -> glTF conversion."""
 
+import errno
 import os
 from pathlib import Path
 
@@ -8,9 +9,14 @@ from .gltf import write_gltf
 from .library import resolve_library
 from .scene import build_jobs
 
-__all__ = ["convert", "load_scene", "DEFAULT_SCALE"]
+__all__ = ["DEFAULT_SCALE", "EmptySceneError", "convert", "load_scene"]
 
 DEFAULT_SCALE = 0.0004  # 1 LDU = 0.4 mm -> meters
+
+
+class EmptySceneError(RuntimeError):
+    """Raised when an LDraw file yields no renderable geometry."""
+
 
 _STUD_TYPES = {
     "normal": _native.StudType.Normal,
@@ -18,6 +24,16 @@ _STUD_TYPES = {
     "none": _native.StudType.Disabled,
     "high-contrast": _native.StudType.HighContrast,
 }
+
+
+def _check_input(in_path: str | os.PathLike[str]) -> str:
+    """Return ``in_path`` as a string, raising if it is not a readable file."""
+    path = Path(in_path)
+    if path.is_dir():
+        raise IsADirectoryError(errno.EISDIR, "not an LDraw file", str(path))
+    if not path.is_file():
+        raise FileNotFoundError(errno.ENOENT, "no such LDraw file", str(path))
+    return str(path)
 
 
 def _build_settings(scale: float, studs: str, gaps: bool) -> _native.GeometrySettings:
@@ -45,8 +61,9 @@ def load_scene(
     gaps: bool = False,
 ) -> _native.LDrawSceneInstanced:
     library = resolve_library(ldraw_library)
+    source = _check_input(in_path)
     settings = _build_settings(scale, studs, gaps)
-    return _native.load_file_instanced(str(in_path), str(library), [], settings)
+    return _native.load_file_instanced(source, str(library), [], settings)
 
 
 def convert(
@@ -59,10 +76,16 @@ def convert(
     gaps: bool = False,
 ) -> Path:
     library = resolve_library(ldraw_library)
+    source = _check_input(in_path)
     settings = _build_settings(scale, studs, gaps)
-    scene = _native.load_file_instanced(str(in_path), str(library), [], settings)
+    scene = _native.load_file_instanced(source, str(library), [], settings)
     color_table = _native.load_color_table(str(library))
     jobs = build_jobs(scene)
+    if not any(job.triangles.shape[0] for job in jobs):
+        raise EmptySceneError(
+            f"{source} produced no geometry. The file may be empty or malformed, "
+            f"or its parts may be missing from the LDraw library at {library}."
+        )
     out_path = Path(out_path)
     write_gltf(jobs, color_table, out_path)
     return out_path
